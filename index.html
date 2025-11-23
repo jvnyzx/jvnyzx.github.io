@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>太空防御战 - Space Defender</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="game-container">
+        <div class="ui-overlay">
+            <div class="hud">
+                <button class="pause-btn" id="pauseBtn" title="暂停 (P)">
+                    <i class="fas fa-pause"></i>
+                </button>
+                <div class="hud-item">
+                    <span class="hud-label">分数</span>
+                    <span id="score" class="hud-value">0</span>
+                </div>
+                <div class="hud-item">
+                    <span class="hud-label">生命</span>
+                    <span id="lives" class="hud-value">3</span>
+                </div>
+                <div class="hud-item">
+                    <span class="hud-label">等级</span>
+                    <span id="level" class="hud-value">1</span>
+                </div>
+                <div class="hud-item">
+                    <span class="hud-label">连击</span>
+                    <span id="combo" class="hud-value">0x</span>
+                </div>
+                <div class="hud-item">
+                    <span class="hud-label">能量</span>
+                    <div class="energy-bar">
+                        <div id="energy-fill" class="energy-fill"></div>
+                    </div>
+                </div>
+                <div class="hud-item">
+                    <span class="hud-label">护盾</span>
+                    <div class="shield-bar">
+                        <div id="shield-fill" class="shield-fill"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="skill-bar">
+                <button class="skill-btn" id="skill1" title="激光炮 (Q)">
+                    <span class="skill-icon">⚡</span>
+                    <div class="skill-cooldown" id="skill1Cooldown"></div>
+                </button>
+                <button class="skill-btn" id="skill2" title="护盾 (E)">
+                    <span class="skill-icon">🛡️</span>
+                    <div class="skill-cooldown" id="skill2Cooldown"></div>
+                </button>
+                <button class="skill-btn" id="skill3" title="导弹 (R)">
+                    <span class="skill-icon">🚀</span>
+                    <div class="skill-cooldown" id="skill3Cooldown"></div>
+                </button>
+            </div>
+        </div>
+
+        <canvas id="gameCanvas"></canvas>
+
+        <div id="startScreen" class="screen">
+            <div class="start-background">
+                <div class="stars-bg"></div>
+                <div class="stars-bg"></div>
+                <div class="stars-bg"></div>
+            </div>
+            <div class="screen-content start-content">
+                <div class="title-container">
+                    <h1 class="game-title">
+                        <span class="title-word">太空</span>
+                        <span class="title-word">防御战</span>
+                    </h1>
+                    <p class="game-subtitle">SPACE DEFENDER</p>
+                    <div class="title-decoration">
+                        <div class="decoration-line"></div>
+                        <div class="decoration-icon">🚀</div>
+                        <div class="decoration-line"></div>
+                    </div>
+                </div>
+                
+                <div class="instructions">
+                    <div class="instruction-section">
+                        <h3><i class="fas fa-gamepad"></i> 基础操作</h3>
+                        <div class="instruction-grid">
+                            <div class="instruction-item">
+                                <span class="key">WASD</span>
+                                <span class="desc">移动飞船</span>
+                            </div>
+                            <div class="instruction-item">
+                                <span class="key">空格</span>
+                                <span class="desc">持续射击</span>
+                            </div>
+                            <div class="instruction-item">
+                                <span class="key">P</span>
+                                <span class="desc">暂停游戏</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="instruction-section">
+                        <h3><i class="fas fa-magic"></i> 特殊技能</h3>
+                        <div class="instruction-grid">
+                            <div class="instruction-item skill-item">
+                                <span class="key skill-key">Q</span>
+                                <span class="desc">激光炮 ⚡</span>
+                            </div>
+                            <div class="instruction-item skill-item">
+                                <span class="key skill-key">E</span>
+                                <span class="desc">护盾 🛡️</span>
+                            </div>
+                            <div class="instruction-item skill-item">
+                                <span class="key skill-key">R</span>
+                                <span class="desc">导弹 🚀</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="instruction-section">
+                        <h3><i class="fas fa-star"></i> 游戏特色</h3>
+                        <div class="features-list">
+                            <div class="feature-item">
+                                <i class="fas fa-fire"></i>
+                                <span>连击系统 - 连续击杀获得分数加成</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-gem"></i>
+                                <span>道具收集 - 能量、生命、护盾、分数</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-trophy"></i>
+                                <span>Boss战 - 每10级挑战强大Boss</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-chart-line"></i>
+                                <span>升级系统 - 6种升级选项</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button id="startBtn" class="btn btn-primary start-button">
+                    <span class="btn-text">开始游戏</span>
+                    <i class="fas fa-rocket btn-icon"></i>
+                </button>
+            </div>
+        </div>
+
+        <div id="gameOverScreen" class="screen hidden">
+            <div class="screen-content">
+                <h2 class="game-over-title">游戏结束</h2>
+                <div class="final-stats">
+                    <p>最终分数: <span id="finalScore">0</span></p>
+                    <p>达到等级: <span id="finalLevel">1</span></p>
+                    <p>最高连击: <span id="finalCombo">0</span>x</p>
+                    <p>击败敌人: <span id="finalKills">0</span></p>
+                    <p class="rating">评级: <span id="finalRating">-</span></p>
+                </div>
+                <button id="restartBtn" class="btn btn-primary">重新开始</button>
+            </div>
+        </div>
+
+        <div id="pauseScreen" class="screen hidden">
+            <div class="screen-content">
+                <h2 class="game-over-title">游戏暂停</h2>
+                <p style="margin: 20px 0; color: #a0c4ff;">按 P 键或点击按钮继续游戏</p>
+                <button id="resumeBtn" class="btn btn-primary">继续游戏</button>
+            </div>
+        </div>
+
+        <div id="upgradeScreen" class="screen hidden">
+            <div class="screen-content upgrade-content">
+                <h2>升级选择</h2>
+                <div class="upgrade-options">
+                    <button class="upgrade-btn" data-upgrade="fireRate">
+                        <span class="upgrade-icon">⚡</span>
+                        <span class="upgrade-name">射击速度</span>
+                        <span class="upgrade-desc">+50% 射击频率</span>
+                    </button>
+                    <button class="upgrade-btn" data-upgrade="damage">
+                        <span class="upgrade-icon">💥</span>
+                        <span class="upgrade-name">攻击力</span>
+                        <span class="upgrade-desc">+100% 伤害</span>
+                    </button>
+                    <button class="upgrade-btn" data-upgrade="speed">
+                        <span class="upgrade-icon">🚀</span>
+                        <span class="upgrade-name">移动速度</span>
+                        <span class="upgrade-desc">+30% 移动速度</span>
+                    </button>
+                    <button class="upgrade-btn" data-upgrade="health">
+                        <span class="upgrade-icon">❤️</span>
+                        <span class="upgrade-name">生命值</span>
+                        <span class="upgrade-desc">+1 生命</span>
+                    </button>
+                    <button class="upgrade-btn" data-upgrade="shield">
+                        <span class="upgrade-icon">🛡️</span>
+                        <span class="upgrade-name">护盾容量</span>
+                        <span class="upgrade-desc">+50% 护盾值</span>
+                    </button>
+                    <button class="upgrade-btn" data-upgrade="multiShot">
+                        <span class="upgrade-icon">🎯</span>
+                        <span class="upgrade-name">多重射击</span>
+                        <span class="upgrade-desc">发射3发子弹</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
+
+
